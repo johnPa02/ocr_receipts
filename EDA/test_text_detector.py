@@ -6,7 +6,6 @@ from PIL import Image
 import os
 
 
-
 ocr = PaddleOCR() # need to run only once to download and load model into memory
 
 for idx, img_path in enumerate(get_random_img_path(filtered_train_img_dir, 10)):
