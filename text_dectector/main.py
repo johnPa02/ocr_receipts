@@ -3,11 +3,12 @@ from fastapi import FastAPI, File, UploadFile
 from pydantic import BaseModel
 from PIL import Image
 from io import BytesIO
-from paddleocr import PaddleOCR
+
+from text_dectector.predict import TextDetectorAPI
 
 app = FastAPI()
 
-ocr = PaddleOCR()
+predictor = TextDetectorAPI(use_gpu=False)
 
 
 class BoxResult(BaseModel):
@@ -22,7 +23,7 @@ async def predict(file: UploadFile = File(...)):
         if file.content_type != "application/pdf":
             image = Image.open(BytesIO(image)).convert("RGB")
             image = np.array(image)
-        result = ocr.ocr(image, cls=False, rec=False)
+        result = predictor.predict(image)
         result = result[0]
         return {"box": result}
     except Exception as e:

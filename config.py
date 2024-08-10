@@ -9,3 +9,6 @@ raw_csv = os.path.join(CONFIG_ROOT, 'data', 'mcocr_train_df.csv')
 # EDA
 filtered_train_img_dir = os.path.join(CONFIG_ROOT, 'data', 'train_images_filtered')
 filtered_csv = os.path.join(CONFIG_ROOT, 'data', 'mcocr_train_df_filtered.csv')
+
+# text_detector
+det_model_dir = os.path.join(CONFIG_ROOT, 'models', 'ch_PP-OCRv3_det_infer')
