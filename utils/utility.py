@@ -1,5 +1,10 @@
+import math
 import os
 import random
+
+import cv2
+import numpy as np
+
 type_map = {1: 'OTHER', 15: 'SELLER', 16: 'ADDRESS', 17: 'TIMESTAMP', 18: 'TOTAL_COST'}
 
 
@@ -16,3 +21,11 @@ def get_random_img_path(folder_path, n):
     list_files = get_list_file_in_folder(folder_path)
     random_image_paths = random.sample(list_files, min(n, len(list_files)))
     return random_image_paths
+
+
+
+
+
+
+
+
