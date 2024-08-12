@@ -15,6 +15,7 @@ def get_list_file_in_folder(folder_path, endswith=['.jpg', '.png', '.JPG', '.PNG
                 list_files.append(os.path.join(root, file))
     return list_files
 
+
 def rotate_image_bbox_angle(img, bboxes, angle):
     def rotate_points(box):
         box_np = np.array(box).astype(float)
