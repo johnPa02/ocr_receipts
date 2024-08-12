@@ -1,13 +1,23 @@
 import math
+import os
+
 import cv2
 import numpy as np
 from rotation_corrector.utils.line_angle_correction import rotate_and_crop
 from scipy.cluster.vq import kmeans, vq
 
 
+def get_list_file_in_folder(folder_path, endswith=['.jpg', '.png', '.JPG', '.PNG']):
+    list_files = []
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            if file.endswith(tuple(endswith)):
+                list_files.append(os.path.join(root, file))
+    return list_files
+
 def rotate_image_bbox_angle(img, bboxes, angle):
     def rotate_points(box):
-        box_np = np.array(box).astype(np.float)
+        box_np = np.array(box).astype(float)
         box_np = np.rint(box_np).astype(np.int32)
         # print(box_np.shape)
         box_np = box_np.reshape(-1, 2)
@@ -67,6 +77,31 @@ def rotate_image_bbox_angle(img, bboxes, angle):
     return img_result, ret_boxes
 
 
+def rotate_image_angle(img, angle):
+    if not isinstance(img, np.ndarray):
+        img = np.array(img)
+    shape_ = img.shape
+    h_org = shape_[0]
+    w_org = shape_[1]
+    Mat_rotation = cv2.getRotationMatrix2D((w_org / 2, h_org / 2), 360 - angle, 1)
+    # print(h_org, w_org)
+    rad = math.radians(angle)
+    sin = math.sin(rad)
+    cos = math.cos(rad)
+    bound_w = (h_org * abs(sin)) + (w_org * abs(cos))
+    bound_h = (h_org * abs(cos)) + (w_org * abs(sin))
+    # print((bound_w / 2) - w_org / 2, ((bound_h / 2) - h_org / 2))
+    Mat_rotation[0, 2] += ((bound_w / 2) - w_org / 2) - 1
+    Mat_rotation[1, 2] += ((bound_h / 2) - h_org / 2) - 1
+    Mat_rotation[1, 2] = 0 if Mat_rotation[1, 2] < 0 else Mat_rotation[1, 2]
+    Mat_rotation[0, 2] = 0 if Mat_rotation[0, 2] < 0 else Mat_rotation[0, 2]
+    # print(Mat_rotation)
+    # Mat_rotation = Mat_rotation.round()
+    bound_w, bound_h = int(bound_w), int(bound_h)
+    img_result = cv2.warpAffine(img, Mat_rotation, (bound_w, bound_h))
+    return img_result
+
+
 def get_boxes_data(img_data, boxes):
     boxes_data = []
     for box_data in boxes:
@@ -110,14 +145,17 @@ class poly():
             segment_pts = [int(f) for f in segment_pts.split(',')]
         elif isinstance(segment_pts, list):
             segment_pts = [round(f) for f in segment_pts]
+            num_pts = int(len(segment_pts) / 2)
+            # print('num_pts', num_pts)
+            first_pts = [segment_pts[0], segment_pts[1]]
+            self.list_pts = [first_pts]
+            for i in range(1, num_pts):
+                self.list_pts.append([segment_pts[2 * i], segment_pts[2 * i + 1]])
+        else:
+            # custom modify here
+            self.list_pts = segment_pts
         self.type = type
         self.value = value
-        num_pts = int(len(segment_pts) / 2)
-        # print('num_pts', num_pts)
-        first_pts = [segment_pts[0], segment_pts[1]]
-        self.list_pts = [first_pts]
-        for i in range(1, num_pts):
-            self.list_pts.append([segment_pts[2 * i], segment_pts[2 * i + 1]])
 
     def reduce_pts(self, dist_thres=7):  # reduce nearly duplicate points
         last_pts = self.list_pts[0]

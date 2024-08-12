@@ -52,6 +52,12 @@ def rotate_and_crop(img, points, debug=False, rotate=True, extend=True,
     warped = cv2.warpPerspective(img, M, (width + 2 * ex, height + 2 * ey))
     h, w, c = warped.shape
     rotate_warped = warped
+
+    # custom modification
+    if (rect[2]) > 45:
+        rotate_warped = cv2.rotate(rotate_warped, cv2.ROTATE_180)
+    # =================
+
     if w < h and rotate:
         rotate_warped = cv2.rotate(warped, cv2.ROTATE_90_CLOCKWISE)
     if debug:

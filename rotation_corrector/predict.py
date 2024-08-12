@@ -1,31 +1,81 @@
-from config import rot_drop_thresh
-from rotation_corrector.utils.utility import rotate_image_bbox_angle, get_boxes_data, drop_box, filter_90_box
-from rotation_corrector.utils.utility import get_mean_horizontal_angle
+import os
+import time
+import cv2
+import numpy as np
+from statistics import mean
+# PyTorch includes
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torchvision.transforms as transforms
+from PIL import Image
+from torch.autograd import Variable
+from utils.loader import get_img_paths, NewPad
+from utils.core import ClsPostProcess
+from utils.utility import rotate_image_angle
+from model.mobilenetv3 import mobilenetv3 as model
 
 
-class ImageRotation:
-    def __init__(self, model_path: str):
-        self.rotation_model = None
-
-    def calculate_page_orient(self, box_rectify, img_rotated, boxes_list):
-        boxes_data = get_boxes_data(img_rotated, boxes_list)
-        rotation_state = {'0': 0, '180': 0}
-        for it, img in enumerate(boxes_data):
-            _, degr = box_rectify.inference(img, debug=False)
-            rotation_state[degr[0]] += 1
-        print(rotation_state)
-        if rotation_state['0'] >= rotation_state['180']:
-            ret = 0
+class CheckQuality:
+    def __init__(self, model=None, transforms=None, weightPath=None, classList=None, backBoneWPath=None, imW=400,
+                 imH=252, device=None):
+        self.classList = classList
+        ## build model
+        if device == None:
+            self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         else:
-            ret = 180
-        return ret
+            self.device = device
+        self.imW = imW
+        self.imH = imH
+        self.net_ = model.to(self.device)
+        self.net_.load_state_dict(torch.load(weightPath,
+                                             map_location=lambda storage, loc: storage))
+        self.net_.eval()
+        self.transform = transforms
+        # net_ = net_.cuda()
 
-    def process_image(self, image, boxes):
-        boxes_list = drop_box(boxes, drop_gap=rot_drop_thresh)
-        rotation = get_mean_horizontal_angle(boxes_list, False)
-        img_rotated, boxes_list = rotate_image_bbox_angle(image, boxes_list, rotation)
+    def inference(self, image, debug=False):
+        if isinstance(image, str):
+            image = Image.open(image)
+        if isinstance(image, np.ndarray):
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            if debug:
+                cv2.imshow('box_rectify. Before', image)
+                print('Before', image.shape)
+                # cv2.waitKey(0)
+            image = Image.fromarray(image)
 
-        deg = self.calculate_page_orient(self.rotation_model, img_rotated, boxes_list)
-        img_rotated, boxes_list = rotate_image_bbox_angle(img_rotated, boxes_list, deg)
-        boxes_list = filter_90_box(boxes_list)
-        return img_rotated, boxes_list
+        x = self.transform(image)
+        x = x.view(1, 3, self.imH, self.imW)
+        x.unsqueeze(0)
+        xx = Variable(x).to(self.device)
+
+        out = self.net_(xx)
+        preds = nn.Softmax(1)(out)
+
+        post_pr = ClsPostProcess(self.classList)
+        post_result = post_pr(preds.clone().detach().numpy())[0]
+        image = rotate_image_angle(image, int(post_result[0]))
+        # image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        if debug:
+            cv2.imshow('box_rectify. After', image)
+            print('After', image.shape, post_result)
+            cv2.waitKey(0)
+        return image, post_result
+
+
+def init_box_rectify_model(weight_path):
+    classList = ['0', '180']
+    device = torch.device('cpu')
+    model_ = model(n_class=2, dropout=.2, input_size=64)
+    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    transform_test = transforms.Compose([
+        NewPad(t_size=(64, 192), fill=(255, 255, 255)),
+        transforms.Resize((64, 192), interpolation=Image.NEAREST),
+        # transforms.CenterCrop((64, 192)),
+        # transforms.RandomCrop((arg.input_size[0], arg.input_size[1])),
+        transforms.ToTensor(),  # 3*H*W, [0, 1]
+        normalize])
+    cq = CheckQuality(model=model_, weightPath=weight_path, classList=classList, transforms=transform_test, imW=192,
+                      imH=64, device=device)
+    return cq
