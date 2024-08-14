@@ -1,5 +1,6 @@
 import cv2
-from paddleocr.tools.infer.utility import parse_args
+from PIL import Image
+from paddleocr.tools.infer.utility import parse_args, draw_ocr
 from paddleocr.tools.infer.predict_det import TextDetector
 from paddleocr.ppocr.utils.utility import check_and_read
 import config
@@ -33,4 +34,9 @@ class TextDetectorAPI:
 
 if __name__ == '__main__':
     text_detector_api = TextDetectorAPI(use_gpu=False)
-    result = text_detector_api.predict("D:/ocr_receipts/data/train_images/mcocr_public_145013ahfqj.jpg")
+    result = text_detector_api.predict(r"D:\ocr_receipts\data\rotated_images\mcocr_public_145013alybg.jpg")
+    result = result[0]
+    image = Image.open(r"D:\ocr_receipts\data\rotated_images\mcocr_public_145013alybg.jpg").convert('RGB')
+    im_show = draw_ocr(image, boxes=result)
+    im_show = Image.fromarray(im_show)
+    im_show.save('./test_results/mcocr_public_145013alybg.jpg')
