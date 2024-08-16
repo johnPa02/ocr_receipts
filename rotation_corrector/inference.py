@@ -5,11 +5,11 @@ from paddleocr.tools.infer.predict_det import TextDetector
 from paddleocr.tools.infer.utility import parse_args
 
 import config
+from utils.utility import get_list_file_in_folder, load_det_model
 from config import rot_drop_thresh, rot_model_path, rot_img_dir, rot_txt_dir, filtered_train_img_dir
 from rotation_corrector.predict import init_box_rectify_model
 from rotation_corrector.utils.utility import rotate_image_bbox_angle, get_boxes_data, drop_box, filter_90_box
 from rotation_corrector.utils.utility import get_mean_horizontal_angle
-from utils.utility import get_list_file_in_folder, load_det_model
 
 
 def write_boxes_to_txt(boxes, txt_path):
@@ -17,6 +17,16 @@ def write_boxes_to_txt(boxes, txt_path):
         for box in boxes:
             box_str = ','.join([str(int(x)) for x in box])
             f.write(box_str + '\n')
+
+
+def get_list_boxes_from_icdar(anno_path):
+    with open(anno_path, 'r') as f:
+        lines = f.readlines()
+    boxes_list = []
+    for line in lines:
+        box = [int(float(x)) for x in line.strip().split(',')[:8]]
+        boxes_list.append(box)
+    return boxes_list
 
 
 class ImageRotationCorrector:

@@ -1,12 +1,12 @@
 import os
-
+from utils.utility import get_list_file_in_folder, load_det_model
 import cv2
 from PIL import Image
 from paddleocr.tools.infer.utility import parse_args, draw_ocr, draw_text_det_res
 from paddleocr.tools.infer.predict_det import TextDetector
 from paddleocr.ppocr.utils.utility import check_and_read
 import config
-from utils.utility import get_list_file_in_folder, load_det_model
+
 
 # class TextDetectorAPI:
 #     def __init__(self, **kwargs):

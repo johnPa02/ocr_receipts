@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 from config import filtered_train_img_dir
 from rotation_corrector.inference import ImageRotationCorrector
-from text_dectector.predict import TextDetectorAPI
+from text_detector.predict import TextDetectorAPI
 from utils.utility import get_list_file_in_folder
 from paddleocr.tools.infer.utility import draw_ocr
 
