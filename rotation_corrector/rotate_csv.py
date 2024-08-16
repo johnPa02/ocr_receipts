@@ -1,8 +1,7 @@
-import ast, cv2, os, csv
+import ast, cv2, os
 from utils.utility import rotate_image_bbox_angle,drop_box, get_mean_horizontal_angle
 from inference import get_list_boxes_from_icdar, ImageRotationCorrector
-from predict import init_box_rectify_model
-from config import rot_model_path, det_out_txt_dir
+from config import det_out_txt_dir
 
 import pandas as pd
 

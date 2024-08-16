@@ -3,6 +3,7 @@ import os
 
 import cv2
 import numpy as np
+from PIL import Image
 from paddleocr.tools.infer.predict_det import TextDetector
 from paddleocr.tools.infer.utility import parse_args
 
@@ -112,7 +113,7 @@ def rotate_image_angle(img, angle):
     return img_result
 
 
-def get_boxes_data(img_data, boxes):
+def get_boxes_data(img_data, boxes, img_type='numpy'):
     boxes_data = []
     for box_data in boxes:
         if isinstance(box_data, dict):
@@ -124,6 +125,8 @@ def get_boxes_data(img_data, boxes):
                                    extend_x_ratio=0.0001,
                                    extend_y_ratio=0.0001,
                                    min_extend_y=2, min_extend_x=1)
+        if img_type == 'pil':
+            box_data = Image.fromarray(box_data)
 
         boxes_data.append(box_data)
     return boxes_data

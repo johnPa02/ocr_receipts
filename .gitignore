@@ -11,3 +11,4 @@ models/
 text_detector/test_results/
 text_detector/paddle_results/
 text_detector/txt_det/
+text_recognitor/ocr_visualize/
