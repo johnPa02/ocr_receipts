@@ -1,11 +1,19 @@
 import math
 import os
 import random
-
+from paddleocr.tools.infer.utility import parse_args
 import cv2
 import numpy as np
+from paddleocr.tools.infer.predict_det import TextDetector
 
 type_map = {1: 'OTHER', 15: 'SELLER', 16: 'ADDRESS', 17: 'TIMESTAMP', 18: 'TOTAL_COST'}
+
+
+def load_det_model(**kwargs):
+    args = parse_args()
+    for key, value in kwargs.items():
+        setattr(args, key, value)
+    return TextDetector(args)
 
 
 def get_list_file_in_folder(folder_path, endswith=['.jpg', '.png', '.JPG', '.PNG']):
@@ -87,9 +95,4 @@ def rotate_and_crop(img, points, debug=False, rotate=True, extend=True,
         cv2.imshow('rotated', rotate_warped)
         cv2.waitKey(0)
     return rotate_warped
-
-
-
-
-
 

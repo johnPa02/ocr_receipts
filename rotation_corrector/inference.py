@@ -1,12 +1,15 @@
 import os.path
 
 import cv2
+from paddleocr.tools.infer.predict_det import TextDetector
+from paddleocr.tools.infer.utility import parse_args
+
+import config
 from config import rot_drop_thresh, rot_model_path, rot_img_dir, rot_txt_dir, filtered_train_img_dir
 from rotation_corrector.predict import init_box_rectify_model
 from rotation_corrector.utils.utility import rotate_image_bbox_angle, get_boxes_data, drop_box, filter_90_box
 from rotation_corrector.utils.utility import get_mean_horizontal_angle
-from text_dectector.predict import TextDetectorAPI
-from utils.utility import get_list_file_in_folder
+from utils.utility import get_list_file_in_folder, load_det_model
 
 
 def write_boxes_to_txt(boxes, txt_path):
@@ -52,7 +55,11 @@ if __name__ == '__main__':
     os.makedirs(rot_txt_dir, exist_ok=True)
 
     imrc = ImageRotationCorrector()
-    text_dectector = TextDetectorAPI(use_gpu=False)
+
+    text_dectector = load_det_model(
+        det_model_dir=config.det_model_dir,
+        use_gpu=False
+    )
     img_paths = get_list_file_in_folder(filtered_train_img_dir)
     for idx, img_path in enumerate(img_paths):
         det_res = text_dectector.predict(img_path)
