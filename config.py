@@ -21,3 +21,7 @@ rot_model_path = os.path.join(CONFIG_ROOT,'rotation_corrector/weights/mobilenetv
 rot_img_dir = os.path.join(CONFIG_ROOT, 'data', 'rotated_images')
 rot_txt_dir = os.path.join(CONFIG_ROOT, 'data', 'txt_det_rotated')
 rotate_filtered_csv = os.path.join(CONFIG_ROOT, 'data', 'mcocr_train_df_filtered_rotated.csv')
+
+# text_recognitor
+rec_thresh = 0.65
+rec_out_txt_dir = os.path.join(CONFIG_ROOT, 'text_recognitor', 'txts')
