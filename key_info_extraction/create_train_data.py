@@ -106,7 +106,8 @@ def create_data_pick_boxes_and_transcripts(icdar_dir, output_dir):
             list_bboxes = f.readlines()
         for idx, line in enumerate(list_bboxes):
             list_bboxes[idx] = str(idx + 1) + ',' + line
-        with open(os.path.join(output_dir, anno.replace('.txt', '.tsv')), mode='wt', encoding='utf-8') as f:
+        out_file = os.path.join(output_dir, os.path.basename(anno).replace('txt','tsv'))
+        with open(os.path.join(out_file), mode='wt', encoding='utf-8') as f:
             f.writelines(list_bboxes)
 
 
@@ -148,5 +149,5 @@ if __name__ == '__main__':
 
     create_data_pick_boxes_and_transcripts(icdar_dir=kie_out_txt_dir,
                                            output_dir=kie_boxes_transcripts)
-    kie_train_dir = os.path.dirname(kie_out_txt_dir)
-    create_data_pick_csv_train_val(kie_train_dir, train_ratio=0.92)
+    # kie_train_dir = os.path.dirname(kie_out_txt_dir)
+    # create_data_pick_csv_train_val(kie_train_dir, train_ratio=0.92)
