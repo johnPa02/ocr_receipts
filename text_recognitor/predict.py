@@ -1,19 +1,23 @@
 import os
-from config import rec_thresh, rec_out_txt_dir, rot_txt_dir
+from config import rec_thresh, rec_out_txt_dir, rot_txt_dir, rot_img_dir
 from utils.utility import get_list_file_in_folder
 import cv2
 from vietocr.tool.predictor import Predictor
 from vietocr.tool.config import Cfg
-
 from rotation_corrector.utils.utility import get_boxes_data
 
-config = Cfg.load_config_from_name('vgg_seq2seq')
 
-config['cnn']['pretrained'] = True
-config['device'] = 'cpu'  # Hoặc 'cpu' nếu không có GPU
+class TextRecognizer:
+    def __init__(self):
+        config = Cfg.load_config_from_name('vgg_seq2seq')
+        config['cnn']['pretrained'] = True
+        config['device'] = 'cpu'  # Hoặc 'cpu' nếu không có GPU
+        self.detector = Predictor(config)
 
-detector = Predictor(config)
-image_dir = r"D:\ocr_receipts\data\rotated_images"
+    def recognize_text(self, img, boxes):
+        boxes_data = get_boxes_data(img, boxes, img_type='pil')
+        txts, scores = self.detector.predict_batch(boxes_data, return_prob=True)
+        return txts, scores
 
 
 def write_result_to_txt(txt_path, boxes, txts, scores, prob_thresh):
@@ -42,14 +46,14 @@ def get_list_boxes_from_icdar(anno_path):
 
 
 def main():
-    list_img_path = get_list_file_in_folder(image_dir)
+    detector = TextRecognizer()
+    list_img_path = get_list_file_in_folder(rot_img_dir)
     for idx, img_path in enumerate(list_img_path):
         img = cv2.imread(img_path)
         txt_path = os.path.join(rot_txt_dir, os.path.basename(img_path).replace('.jpg', '.txt'))
         txt_out_path = os.path.join(rec_out_txt_dir, os.path.basename(img_path).replace('.jpg', '.txt'))
         boxes = get_list_boxes_from_icdar(txt_path)
-        boxes_data = get_boxes_data(img, boxes, img_type='pil')
-        txts, scores = detector.predict_batch(boxes_data, return_prob=True)
+        txts, scores = detector.recognize_text(img, boxes)
 
         # draw result
         # im_show = draw_ocr(img, boxes,txts, scores, font_path='./Arial.ttf')
