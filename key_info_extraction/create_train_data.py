@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 
 from config import filtered_csv, rec_out_txt_dir, kie_out_txt_dir, rot_img_dir, filterd_rotated_csv, \
-    kie_boxes_transcripts
+    kie_boxes_transcripts, kie_boxes_transcripts_test
 from utils.utility import cer_loss_one_image, get_list_file_in_folder
 from utils.utility import color_map, type_map, get_list_gt_poly, get_list_icdar_poly, IoU
 
@@ -151,5 +151,12 @@ if __name__ == '__main__':
 
     # create_data_pick_boxes_and_transcripts(icdar_dir=kie_out_txt_dir,
     #                                        output_dir=kie_boxes_transcripts)
-    kie_train_dir = os.path.dirname(kie_out_txt_dir)
-    create_data_pick_csv_train_val(kie_train_dir, train_ratio=0.92)
+
+    # Create train data
+    # kie_train_dir = os.path.dirname(kie_out_txt_dir)
+    # create_data_pick_csv_train_val(kie_train_dir, train_ratio=0.92)
+
+    # Create test data
+    create_data_pick_boxes_and_transcripts(icdar_dir=rec_out_txt_dir,
+                                           output_dir=kie_boxes_transcripts_test)
+

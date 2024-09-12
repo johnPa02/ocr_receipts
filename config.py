@@ -30,3 +30,4 @@ rec_out_txt_dir = os.path.join(CONFIG_ROOT, 'text_recognitor', 'txts')
 # key_info_extraction
 kie_out_txt_dir = os.path.join(CONFIG_ROOT, 'key_info_extraction', 'txts')
 kie_boxes_transcripts = os.path.join(CONFIG_ROOT, 'key_info_extraction', 'boxes_and_transcripts')
+kie_boxes_transcripts_test = os.path.join(CONFIG_ROOT, 'key_info_extraction', 'boxes_and_transcripts_test')
