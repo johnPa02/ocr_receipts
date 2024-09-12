@@ -84,7 +84,7 @@ def main(args):
                     entities.append(entity)
 
                 result_file = output_path.joinpath(Path(test_dataset.files_list[image_index]).stem + '.txt')
-                with result_file.open(mode='w') as f:
+                with result_file.open(mode='w', encoding='utf8') as f:
                     for item in entities:
                         f.write('{}\t{}\n'.format(item['entity_name'], item['text']))
 
@@ -103,5 +103,10 @@ if __name__ == '__main__':
                       help='GPU id to use. (default: -1, cpu)')
     args.add_argument('--bs', '--batch_size', default=1, type=int,
                       help='batch size (default: 1)')
+
+    import pathlib
+    temp = pathlib.PosixPath
+    pathlib.PosixPath = pathlib.WindowsPath
+
     args = args.parse_args()
     main(args)
