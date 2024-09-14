@@ -39,6 +39,7 @@ class KeyInfoExtractor:
         output_path = Path(kie_result_dir)
         output_path.mkdir(parents=True, exist_ok=True)
 
+        res = []
         # predict and save to file
         with torch.no_grad():
             for step_idx, input_data_item in tqdm(enumerate(test_data_loader)):
@@ -79,9 +80,13 @@ class KeyInfoExtractor:
                         entities.append(entity)
 
                     result_file = output_path.joinpath(Path(test_dataset.files_list[image_index]).stem + '.txt')
+
+                    res.append((result_file, entities))
+
                     with result_file.open(mode='w', encoding='utf8') as f:
                         for item in entities:
                             f.write('{}\t{}\n'.format(item['entity_name'], item['text']))
+        return res
 
     def save_boxes_and_transcripts(self, img_path, boxes_list, txts, scores):
         img_name = Path(img_path).stem
