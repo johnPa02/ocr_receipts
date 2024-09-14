@@ -17,7 +17,7 @@ import pandas as pd
 
 from . import documents
 from .documents import Document
-from utils.class_utils import keys_vocab_cls, iob_labels_vocab_cls, entities_vocab_cls
+from ..utils.class_utils import keys_vocab_cls, iob_labels_vocab_cls, entities_vocab_cls
 
 
 class PICKDataset(Dataset):

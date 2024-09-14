@@ -98,19 +98,6 @@ def create_data_pick_boxes_and_transcripts(icdar_dir, output_dir):
             f.writelines(list_bboxes)
 
 
-def create_data_pick_boxes_and_transcripts(icdar_dir, output_dir):
-    list_file = get_list_file_in_folder(icdar_dir, endswith=['txt'])
-    for idx, anno in enumerate(list_file):
-        print(idx, anno)
-        with open(os.path.join(icdar_dir, anno), mode='r', encoding='utf-8') as f:
-            list_bboxes = f.readlines()
-        for idx, line in enumerate(list_bboxes):
-            list_bboxes[idx] = str(idx + 1) + ',' + line
-        out_file = os.path.join(output_dir, os.path.basename(anno).replace('txt','tsv'))
-        with open(os.path.join(out_file), mode='wt', encoding='utf-8') as f:
-            f.writelines(list_bboxes)
-
-
 def create_data_pick_csv_train_val(train_dir, train_ratio=0.92):
     list_files = get_list_file_in_folder(os.path.join(train_dir, 'images'))
     num_total = len(list_files)
