@@ -10,10 +10,10 @@ import torch.nn.functional as F
 import torchvision.transforms as transforms
 from PIL import Image
 from torch.autograd import Variable
-from utils.loader import get_img_paths, NewPad
-from utils.core import ClsPostProcess
-from utils.utility import rotate_image_angle
-from model.mobilenetv3 import mobilenetv3 as model
+from rotation_corrector.utils.loader import get_img_paths, NewPad
+from rotation_corrector.utils.core import ClsPostProcess
+from rotation_corrector.utils.utility import rotate_image_angle
+from rotation_corrector.model.mobilenetv3 import mobilenetv3 as model
 
 
 class CheckQuality:

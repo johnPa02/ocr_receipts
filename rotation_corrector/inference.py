@@ -1,11 +1,10 @@
 import os.path
 
 import cv2
-from paddleocr.tools.infer.predict_det import TextDetector
-from paddleocr.tools.infer.utility import parse_args
 
 import config
-from utils.utility import get_list_file_in_folder, load_det_model
+
+from utils.utility import get_list_file_in_folder
 from config import rot_drop_thresh, rot_model_path, rot_img_dir, rot_txt_dir, filtered_train_img_dir
 from rotation_corrector.predict import init_box_rectify_model
 from rotation_corrector.utils.utility import rotate_image_bbox_angle, get_boxes_data, drop_box, filter_90_box
@@ -59,6 +58,8 @@ class ImageRotationCorrector:
 
 
 if __name__ == '__main__':
+    from text_detector.predict import CustomTextDetector
+
     if os.path.exists(rot_img_dir) or os.path.exists(rot_txt_dir):
         raise Exception("Output folder already exists, it will be overwritten")
     os.makedirs(rot_img_dir, exist_ok=True)
@@ -66,7 +67,7 @@ if __name__ == '__main__':
 
     imrc = ImageRotationCorrector()
 
-    text_dectector = load_det_model(
+    text_dectector = CustomTextDetector(
         det_model_dir=config.det_model_dir,
         use_gpu=False
     )

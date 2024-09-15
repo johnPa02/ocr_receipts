@@ -11,8 +11,8 @@ from datetime import datetime
 
 import torch.distributed as dist
 
-from logger import setup_logging
-from utils import read_json, write_json
+from key_info_extraction.PICK.logger import setup_logging
+from key_info_extraction.PICK.utils import read_json, write_json
 
 
 class ConfigParser:

@@ -2,16 +2,13 @@
 # @Author: Wenwen Yu
 # @Created Time: 7/8/2020 10:53 AM
 
-import math
 import argparse
 import collections
 from pathlib import Path
 from tqdm import tqdm
 import pandas as pd
-import cv2
 
 import torch
-import torch.nn as nn
 from torch.utils.data.dataloader import DataLoader
 
 from model.graph import GLCN

@@ -9,7 +9,6 @@ import collections
 import numpy as np
 import torch
 import torch.distributed as dist
-from torch.nn.parallel import DistributedDataParallel as DDP
 
 import model.pick as pick_arch_module
 from data_utils import pick_dataset as pick_dataset_module
@@ -17,9 +16,6 @@ from data_utils import pick_dataset as pick_dataset_module
 from data_utils.pick_dataset import BatchCollateFn
 from parse_config import ConfigParser
 from trainer import Trainer
-
-import torch.nn as nn
-import torch.optim as optim
 
 # fix random seeds for reproducibility
 SEED = 123

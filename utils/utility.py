@@ -1,10 +1,8 @@
 import math
 import os
 import random
-from paddleocr.tools.infer.utility import parse_args
 import cv2
 import numpy as np
-from paddleocr.tools.infer.predict_det import TextDetector
 import Levenshtein, ast
 
 type_map = {1: 'OTHER', 15: 'SELLER', 16: 'ADDRESS', 17: 'TIMESTAMP', 18: 'TOTAL_COST'}
@@ -12,11 +10,7 @@ color_map = {15: (0, 255, 0), 16: (255, 0, 0), 17: (0, 0, 255), 18: (0, 255, 255
 inv_type_map = {v: k for k, v in type_map.items()}
 
 
-def load_det_model(**kwargs):
-    args = parse_args()
-    for key, value in kwargs.items():
-        setattr(args, key, value)
-    return TextDetector(args)
+
 
 
 def get_list_file_in_folder(folder_path, endswith=['.jpg', '.png', '.JPG', '.PNG']):

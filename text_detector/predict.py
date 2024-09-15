@@ -1,5 +1,5 @@
 import os
-from utils.utility import get_list_file_in_folder, load_det_model
+from utils.utility import get_list_file_in_folder
 import cv2
 from PIL import Image
 from paddleocr.tools.infer.utility import parse_args, draw_ocr, draw_text_det_res
@@ -33,9 +33,19 @@ import config
 #             det_res.append(dt_boxes)
 #         return det_res
 
+class CustomTextDetector:
+    def __init__(self, **kwargs):
+        args = parse_args()
+        for key, value in kwargs.items():
+            setattr(args, key, value)
+        self.text_detector = TextDetector(args)
+
+    def __call__(self, image):
+        return self.text_detector(image)
+
 
 if __name__ == '__main__':
-    text_detector = load_det_model(
+    text_detector = CustomTextDetector(
         det_model_dir=config.det_model_dir,
         use_gpu=False
     )

@@ -3,7 +3,7 @@
 import logging
 import logging.config
 from pathlib import Path
-from utils import read_json
+from key_info_extraction.PICK.utils import read_json
 
 
 def setup_logging(save_dir, log_config='logger_config.json', default_level=logging.INFO):

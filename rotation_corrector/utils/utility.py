@@ -4,18 +4,10 @@ import os
 import cv2
 import numpy as np
 from PIL import Image
-from paddleocr.tools.infer.predict_det import TextDetector
-from paddleocr.tools.infer.utility import parse_args
 
 from rotation_corrector.utils.line_angle_correction import rotate_and_crop
 from scipy.cluster.vq import kmeans, vq
 
-
-def load_det_model(**kwargs):
-    args = parse_args()
-    for key, value in kwargs.items():
-        setattr(args, key, value)
-    return TextDetector(args)
 
 def get_list_file_in_folder(folder_path, endswith=['.jpg', '.png', '.JPG', '.PNG']):
     list_files = []
