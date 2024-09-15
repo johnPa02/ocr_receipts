@@ -3,10 +3,10 @@ from torch.utils.data.dataloader import DataLoader
 from allennlp.data.dataset_readers.dataset_utils.span_utils import bio_tags_to_spans
 from pathlib import Path
 from tqdm import tqdm
-import PICK.model.pick as pick_arch_module
-from PICK.data_utils.pick_dataset import PICKDataset
-from PICK.data_utils.pick_dataset import BatchCollateFn
-from PICK.utils.util import iob_index_to_str, text_index_to_str
+import key_info_extraction.PICK.model.pick as pick_arch_module
+from key_info_extraction.PICK.data_utils.pick_dataset import PICKDataset
+from key_info_extraction.PICK.data_utils.pick_dataset import BatchCollateFn
+from key_info_extraction.PICK.utils.util import iob_index_to_str, text_index_to_str
 from config import kie_model_dir, kie_result_dir, kie_boxes_transcripts_temp, rec_thresh
 
 

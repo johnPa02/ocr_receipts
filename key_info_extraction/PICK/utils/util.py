@@ -9,7 +9,7 @@ from collections import OrderedDict
 import torch
 
 from .class_utils import keys_vocab_cls, iob_labels_vocab_cls
-from data_utils import documents
+from key_info_extraction.PICK.data_utils import documents
 
 
 def ensure_dir(dirname):

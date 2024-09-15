@@ -11,7 +11,7 @@ import numpy as np
 from .encoder import Encoder
 from .graph import GLCN
 from .decoder import Decoder
-from utils.class_utils import keys_vocab_cls, iob_labels_vocab_cls
+from key_info_extraction.PICK.utils.class_utils import keys_vocab_cls, iob_labels_vocab_cls
 
 
 class PICKModel(nn.Module):
