@@ -1,5 +1,4 @@
 import os
-from utils.utility import get_list_file_in_folder
 import cv2
 from PIL import Image
 from paddleocr.tools.infer.utility import parse_args, draw_ocr, draw_text_det_res
@@ -45,6 +44,7 @@ class CustomTextDetector:
 
 
 if __name__ == '__main__':
+    from utils.utility import get_list_file_in_folder
     text_detector = CustomTextDetector(
         det_model_dir=config.det_model_dir,
         use_gpu=False

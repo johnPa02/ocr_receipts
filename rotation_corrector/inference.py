@@ -4,7 +4,7 @@ import cv2
 
 import config
 
-from utils.utility import get_list_file_in_folder
+from rotation_corrector.utils.utility import get_list_file_in_folder
 from config import rot_drop_thresh, rot_model_path, rot_img_dir, rot_txt_dir, filtered_train_img_dir
 from rotation_corrector.predict import init_box_rectify_model
 from rotation_corrector.utils.utility import rotate_image_bbox_angle, get_boxes_data, drop_box, filter_90_box

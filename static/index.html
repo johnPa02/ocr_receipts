@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt OCR</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f8f8;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .image-section {
+            margin-right: 20px;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-section img {
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .upload-result-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .upload-section {
+            border: 2px dashed #9ecaed;
+            width: 100%;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        .upload-section input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-section label {
+            color: #666;
+            font-size: 16px;
+            cursor: pointer;
+            pointer-events: none; /* Allow clicks to pass through the label to the input */
+        }
+
+        .result-section {
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .result-table th, .result-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Image section on the left -->
+        <div class="image-section">
+            <img id="imagePreview" src="" alt="Receipt Image Preview">
+        </div>
+
+        <!-- Upload and result section on the right -->
+        <div class="upload-result-section">
+            <div class="upload-section">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <input type="file" name="file" id="fileInput" accept="image/*" onchange="previewImage(event); uploadFile()" required>
+                    <label for="fileInput">Drag or upload a receipt here and see it in action</label>
+                </form>
+            </div>
+            <div class="result-section">
+                <h2>Extracted Receipt Information</h2>
+                <table class="result-table" id="resultTable">
+                    <tr><th>SELLER</th><th>NONE</th></tr>
+                    <tr><th>ADDRESS</th><th>NONE</th></tr>
+                    <tr><th>TIME_STAMP</th><th>NONE</th></tr>
+                    <tr><th>TOTAL</th><th>NONE</th></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Preview the selected image before uploading
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function () {
+                var output = document.getElementById('imagePreview');
+                output.src = reader.result;
+                output.style.display = 'block'; // Show the image preview
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function uploadFile() {
+            var formData = new FormData(document.getElementById('uploadForm'));
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/', true);
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    var entities = JSON.parse(xhr.responseText);
+                    var resultTable = document.getElementById('resultTable');
+
+                    // Clear previous results
+                    resultTable.innerHTML = '';
+
+                    // Display new results
+                    for (var key in entities) {
+                        if (entities.hasOwnProperty(key)) {
+                            var row = resultTable.insertRow();
+                            var cell1 = row.insertCell(0);
+                            var cell2 = row.insertCell(1);
+                            cell1.textContent = key;
+                            cell2.textContent = entities[key];
+                        }
+                    }
+                } else {
+                    alert('Failed to upload the file. Please try again.');
+                }
+            };
+
+            xhr.send(formData);
+        }
+    </script>
+</body>
+</html>

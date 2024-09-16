@@ -12,6 +12,10 @@ from key_info_extraction.PICK.utils.util import iob_index_to_str, text_index_to_
 
 class KeyInfoExtractor:
     def __init__(self, checkpoint_path=kie_model_dir, gpu_id=-1):
+        import pathlib
+        temp = pathlib.PosixPath
+        pathlib.PosixPath = pathlib.WindowsPath
+
         # Thiết lập thiết bị (CPU hoặc GPU)
         self.device = torch.device(f'cuda:{gpu_id}' if gpu_id != -1 else 'cpu')
         # Load mô hình từ checkpoint
@@ -33,13 +37,13 @@ class KeyInfoExtractor:
                                    ignore_error=False,
                                    training=False)
         test_data_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False,
-                                      num_workers=1, collate_fn=BatchCollateFn(training=False))
+                                      num_workers=0, collate_fn=BatchCollateFn(training=False))
 
         # setup output path
         output_path = Path(kie_result_dir)
         output_path.mkdir(parents=True, exist_ok=True)
 
-        res = []
+        # res = []
         # predict and save to file
         with torch.no_grad():
             for step_idx, input_data_item in tqdm(enumerate(test_data_loader)):
@@ -73,30 +77,30 @@ class KeyInfoExtractor:
                     spans = bio_tags_to_spans(decoded_tags, [])
                     spans = sorted(spans, key=lambda x: x[1][0])
 
-                    entities = []  # exists one to many case
+                    entities = {}  # exists one to many case
                     for entity_name, range_tuple in spans:
-                        entity = dict(entity_name=entity_name,
-                                      text=''.join(decoded_texts[range_tuple[0]:range_tuple[1] + 1]))
-                        entities.append(entity)
+                        if entity_name not in entities:
+                            entities[entity_name] = ''.join(decoded_texts[range_tuple[0]:range_tuple[1] + 1])
+                        else:
+                            entities[entity_name] += ' - ' + ''.join(decoded_texts[range_tuple[0]:range_tuple[1] + 1])
+                    return entities
+                    # result_file = output_path.joinpath(Path(test_dataset.files_list[image_index]).stem + '.txt')
 
-                    result_file = output_path.joinpath(Path(test_dataset.files_list[image_index]).stem + '.txt')
+                    # res.append((result_file, entities))
 
-                    res.append((result_file, entities))
-
-                    with result_file.open(mode='w', encoding='utf8') as f:
-                        for item in entities:
-                            f.write('{}\t{}\n'.format(item['entity_name'], item['text']))
-        return res
+                    # with result_file.open(mode='w', encoding='utf8') as f:
+                    #     for item in entities:
+                    #         f.write('{}\t{}\n'.format(item['entity_name'], item['text']))
 
     def save_boxes_and_transcripts(self, img_path, boxes_list, txts, scores):
         img_name = Path(img_path).stem
         output_path = Path(kie_boxes_transcripts_temp)
         output_path.mkdir(parents=True, exist_ok=True)
-        output_file = output_path.joinpath(f'{img_name}.txt')
+        output_file = output_path.joinpath(f'{img_name}.tsv')
 
         res = ''
         for idx, box in enumerate(boxes_list):
-            str_box = ','.join(boxes_list)
+            str_box = ','.join(map(str, box))
             if scores[idx] > rec_thresh:
                 res += f"{idx+1},{str_box}, {txts[idx]}"
             else:

@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
 
 import app_config
@@ -22,19 +22,18 @@ def upload_file():
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
-            redirect(request.url)
+            return jsonify({'error': 'No file part'})
         file = request.files['file']
         if file.filename == '':
-            redirect(request.url)
+            return jsonify({'error': 'No selected file'})
         if file and allowed_file(file.filename):
             file_name = secure_filename(file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], file_name)
             file.save(file_path)
 
-            result = pipeline.process_image(file_path)
-            entities = result[0]
-            return render_template('result.html', entities=entities)
-    return render_template('upload.html')
+            entities = pipeline.process_image(file_path)
+            return jsonify(entities)
+    return app.send_static_file('index.html')
 
 
 if __name__ == '__main__':

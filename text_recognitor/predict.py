@@ -1,6 +1,5 @@
 import os
 from config import rec_thresh, rec_out_txt_dir, rot_txt_dir, rot_img_dir
-from utils.utility import get_list_file_in_folder
 import cv2
 from vietocr.tool.predictor import Predictor
 from vietocr.tool.config import Cfg
@@ -46,6 +45,7 @@ def get_list_boxes_from_icdar(anno_path):
 
 
 def main():
+    from utils.utility import get_list_file_in_folder
     detector = TextRecognizer()
     list_img_path = get_list_file_in_folder(rot_img_dir)
     for idx, img_path in enumerate(list_img_path):
