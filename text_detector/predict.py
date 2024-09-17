@@ -42,6 +42,11 @@ class CustomTextDetector:
     def __call__(self, image):
         return self.text_detector(image)
 
+    @staticmethod
+    def draw_ocr(img, dt_boxes, out_path):
+        src_im = draw_text_det_res(dt_boxes, img)
+        cv2.imwrite(out_path, src_im)
+
 
 if __name__ == '__main__':
     from utils.utility import get_list_file_in_folder
@@ -56,11 +61,11 @@ if __name__ == '__main__':
         img = cv2.imread(image_file)
         dt_boxes, _ = text_detector(img)
         # draw boxes to image
-        # src_im = draw_text_det_res(dt_boxes, img)
-        # img_path = os.path.join(
-        #     'paddle_results', "det_res_{}".format(os.path.basename(image_file))
-        # )
-        # cv2.imwrite(img_path, src_im)
+        src_im = draw_text_det_res(dt_boxes, img)
+        img_path = os.path.join(
+            'paddle_results', "det_res_{}".format(os.path.basename(image_file))
+        )
+        cv2.imwrite(img_path, src_im)
 
         # save boxes to txt
         txt_path = os.path.join(

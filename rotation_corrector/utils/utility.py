@@ -262,6 +262,7 @@ def get_mean_horizontal_angle(boxlist, debug=False, cluster=True):
     mean_angle = mean_angle - 90
     return mean_angle
 
+
 def filter_90_box(boxlist, debug=False, thresh=45):
     if not boxlist:
         return 0

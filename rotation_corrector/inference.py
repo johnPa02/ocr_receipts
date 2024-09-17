@@ -38,21 +38,22 @@ class ImageRotationCorrector:
         for it, img in enumerate(boxes_data):
             _, degr = self.rotation_model.inference(img, debug=False)
             rotation_state[degr[0]] += 1
-            if degr[0] == '180':
-                print('180')
         if rotation_state['0'] >= rotation_state['180']:
             ret = 0
         else:
             ret = 180
         return ret
 
-    def process_image(self, image, boxes):
+    def process_image(self, image, boxes, det_model):
         boxes_list = drop_box(boxes, drop_gap=rot_drop_thresh)
         rotation = get_mean_horizontal_angle(boxes_list, False)
         img_rotated, boxes_list = rotate_image_bbox_angle(image, boxes_list, rotation)
         deg = self.calculate_page_orient(img_rotated, boxes_list)
-        print(deg)
         img_rotated, boxes_list = rotate_image_bbox_angle(img_rotated, boxes_list, deg)
+        print(rotation)
+        if abs(rotation) > 45:
+            boxes, _ = det_model(img_rotated)
+            boxes_list = [arr.flatten().tolist() for arr in boxes]
         boxes_list = filter_90_box(boxes_list)
         return img_rotated, boxes_list
 

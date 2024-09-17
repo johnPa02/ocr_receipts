@@ -25,7 +25,10 @@ class OCRPipeline:
         img = cv2.imread(img_path)
         boxes, _ = self.text_detector(img)
         # Correct rotation
-        img_rotated, boxes_list = self.rotation_corrector.process_image(img, boxes)
+        img_rotated, boxes_list = self.rotation_corrector.process_image(img, boxes, self.text_detector)
+        # Draw boxes for debugging
+        out_path = os.path.join(r'D:\ocr_receipts\text_detector\test_results', os.path.basename(img_path))
+        self.text_detector.draw_ocr(img_rotated, boxes_list, out_path)
         # Recognize text
         txts, scores = self.text_recognizer.recognize_text(img_rotated, boxes_list)
         # Extract key information
@@ -41,5 +44,6 @@ if __name__ == '__main__':
     pathlib.PosixPath = pathlib.WindowsPath
 
     pipeline = OCRPipeline()
-    entities = pipeline.process_image(r'D:\ocr_receipts\data\rotated_images\mcocr_public_145013aagqw.jpg')
+    entities = pipeline.process_image(r'D:\ocr_receipts\data\val_images\mcocr_val_145115gozuc.jpg')
     print(entities)
+    # mcocr_val_145115gozuc

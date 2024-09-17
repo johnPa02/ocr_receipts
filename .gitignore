@@ -7,9 +7,13 @@ venv/
 .DS_Store
 .idea/
 models/
+uploads/
 text_detector/test_results/
 text_detector/paddle_results/
 text_detector/txt_det/
 text_recognitor/ocr_visualize/
 text_recognitor/txts/
 key_info_extraction/txts/
+key_info_extraction/pick_predict_train/
+key_info_extraction/boxes_and_transcripts_temp/
+data/val_images/

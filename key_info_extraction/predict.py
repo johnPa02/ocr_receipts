@@ -79,10 +79,11 @@ class KeyInfoExtractor:
 
                     entities = {}  # exists one to many case
                     for entity_name, range_tuple in spans:
+                        text = ''.join(decoded_texts[range_tuple[0]:range_tuple[1] + 1])
                         if entity_name not in entities:
-                            entities[entity_name] = ''.join(decoded_texts[range_tuple[0]:range_tuple[1] + 1])
+                            entities[entity_name] = text
                         else:
-                            entities[entity_name] += ' - ' + ''.join(decoded_texts[range_tuple[0]:range_tuple[1] + 1])
+                            entities[entity_name] += ' - ' + text
                     return entities
                     # result_file = output_path.joinpath(Path(test_dataset.files_list[image_index]).stem + '.txt')
 
@@ -102,7 +103,7 @@ class KeyInfoExtractor:
         for idx, box in enumerate(boxes_list):
             str_box = ','.join(map(str, box))
             if scores[idx] > rec_thresh:
-                res += f"{idx+1},{str_box}, {txts[idx]}"
+                res += f"{idx+1},{str_box},{txts[idx]}"
             else:
                 res += f"{idx+1},{str_box},"
             res += '\n'
