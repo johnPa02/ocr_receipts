@@ -9,6 +9,36 @@ from key_info_extraction.PICK.data_utils.pick_dataset import PICKDataset
 from key_info_extraction.PICK.data_utils.pick_dataset import BatchCollateFn
 from key_info_extraction.PICK.utils.util import iob_index_to_str, text_index_to_str
 
+from allennlp.data.dataset_readers.dataset_utils.span_utils import InvalidTagSequence
+from typing import List, Tuple
+TypedStringSpan = Tuple[str, Tuple[int, int]]
+
+
+def bio_tags_to_spans2(
+        tag_sequence: List[str], text_length: List[int] = None
+) -> List[TypedStringSpan]:
+    list_idx_to_split = [0]
+    init_idx = 0
+    for text_len in text_length[0]:
+        init_idx += text_len
+        list_idx_to_split.append(init_idx)
+
+    spans = []
+    line_pos_from_bottom = []
+    for index, string_tag in enumerate(tag_sequence):
+        bio_tag = string_tag[0]
+        if bio_tag not in ["B", "I", "O"]:
+            raise InvalidTagSequence(tag_sequence)
+        conll_tag = string_tag[2:]
+
+        if bio_tag == "B":
+            if index in list_idx_to_split:
+                idx_start = list_idx_to_split.index(index)
+                idx_end = list_idx_to_split[idx_start + 1] - 1
+                spans.append((conll_tag, (index, idx_end)))
+                line_pos_from_bottom.append(idx_start)
+    return spans, line_pos_from_bottom
+
 
 class KeyInfoExtractor:
     def __init__(self, checkpoint_path=kie_model_dir, gpu_id=-1):
@@ -59,6 +89,7 @@ class KeyInfoExtractor:
                 new_mask = output['new_mask']
                 image_indexs = input_data_item['image_indexs']  # (B,)
                 text_segments = input_data_item['text_segments']  # (B, num_boxes, T)
+                text_length = input_data_item['text_length']
                 mask = input_data_item['mask']
                 # List[(List[int], torch.Tensor)]
                 best_paths = self.pick_model.decoder.crf_layer.viterbi_tags(logits, mask=new_mask, logits_batch_first=True)
@@ -74,8 +105,9 @@ class KeyInfoExtractor:
                 for decoded_tags, decoded_texts, image_index in zip(decoded_tags_list, decoded_texts_list,
                                                                     image_indexs):
                     # List[ Tuple[str, Tuple[int, int]] ]
-                    spans = bio_tags_to_spans(decoded_tags, [])
-                    spans = sorted(spans, key=lambda x: x[1][0])
+                    # spans = bio_tags_to_spans(decoded_tags, [])
+                    # spans = sorted(spans, key=lambda x: x[1][0])
+                    spans, line_pos_from_bottom = bio_tags_to_spans2(decoded_tags, text_length.cpu().numpy())
 
                     entities = {}  # exists one to many case
                     for entity_name, range_tuple in spans:

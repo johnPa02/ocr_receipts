@@ -12,6 +12,8 @@ class OCRPipeline:
     def __init__(self):
         self.text_detector = CustomTextDetector(
             det_model_dir=config.det_model_dir,
+            det_db_thresh=config.det_db_thresh,
+            det_db_box_thresh=config.det_db_box_thresh,
             use_gpu=False
         )
         self.rotation_corrector = ImageRotationCorrector()

@@ -237,6 +237,22 @@ class poly():
         return line_str
 
 
+def filter_outliers_angle(list_angle, thresh=45):
+    all_box_angle = np.array(list_angle)
+    all_box_angle = np.absolute(all_box_angle)
+    if all_box_angle.max() - all_box_angle.min() > thresh:
+        codebook, _ = kmeans(all_box_angle, 2)  # three clusters
+        cluster_indices, _ = vq(all_box_angle, codebook)
+        clas = set(cluster_indices)
+        ret = {c: [] for c in clas}
+        for idx, v in enumerate(all_box_angle):
+            ret[cluster_indices[idx]].append(v)
+        ret = list(ret.values())
+        ret = sorted(ret, key=lambda e: len(e))
+        list_angle = ret[-1]
+    return list_angle
+
+
 def get_mean_horizontal_angle(boxlist, debug=False, cluster=True):
     if not boxlist:
         return 0
@@ -257,6 +273,8 @@ def get_mean_horizontal_angle(boxlist, debug=False, cluster=True):
             angle_with_horizontal_line = math.fabs(angle_with_horizontal_line) - 90
         all_box_angle.append(angle_with_horizontal_line)
 
+    if cluster:
+        all_box_angle = filter_outliers_angle(all_box_angle)
     # all_box_angle
     mean_angle = np.array(all_box_angle).mean()
     mean_angle = mean_angle - 90

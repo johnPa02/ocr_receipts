@@ -14,6 +14,8 @@ filterd_rotated_csv = os.path.join(CONFIG_ROOT, 'data', 'mcocr_train_df_filtered
 # text_detector
 det_model_dir = os.path.join(CONFIG_ROOT, 'models', 'ch_PP-OCRv3_det_infer')
 det_out_txt_dir = os.path.join(CONFIG_ROOT, 'text_detector', 'txt_det')
+det_db_thresh = 0.3
+det_db_box_thresh = 0.5
 
 # rotation_corrector
 rot_drop_thresh = [.5, 2]
