@@ -13,6 +13,8 @@ text_detector/paddle_results/
 text_detector/txt_det/
 text_recognitor/ocr_visualize/
 text_recognitor/txts/
+text_recognitor/cropped_images/
+text_recognitor/cropped_images_labels.txt
 key_info_extraction/txts/
 key_info_extraction/pick_predict_train/
 key_info_extraction/boxes_and_transcripts_temp/
