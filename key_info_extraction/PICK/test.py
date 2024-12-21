@@ -103,9 +103,5 @@ if __name__ == '__main__':
     args.add_argument('--bs', '--batch_size', default=1, type=int,
                       help='batch size (default: 1)')
 
-    import pathlib
-    temp = pathlib.PosixPath
-    pathlib.PosixPath = pathlib.WindowsPath
-
     args = args.parse_args()
     main(args)

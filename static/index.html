@@ -108,7 +108,7 @@
         <div class="upload-result-section">
             <div class="upload-section">
                 <form id="uploadForm" enctype="multipart/form-data">
-                    <input type="file" name="file" id="fileInput" accept="image/*" onchange="previewImage(event); uploadFile()" required>
+                    <input type="file" name="file" id="fileInput" accept="image/*" onchange="uploadFile()" required>
                     <label for="fileInput">Drag or upload a receipt here and see it in action</label>
                 </form>
             </div>
@@ -125,32 +125,21 @@
     </div>
 
     <script>
-        // Preview the selected image before uploading
-        function previewImage(event) {
-            var reader = new FileReader();
-            reader.onload = function () {
-                var output = document.getElementById('imagePreview');
-                output.src = reader.result;
-                output.style.display = 'block'; // Show the image preview
-            };
-            reader.readAsDataURL(event.target.files[0]);
-        }
-
         function uploadFile() {
             var formData = new FormData(document.getElementById('uploadForm'));
-
             var xhr = new XMLHttpRequest();
             xhr.open('POST', '/', true);
 
             xhr.onload = function () {
                 if (xhr.status === 200) {
-                    var entities = JSON.parse(xhr.responseText);
+                    var response = JSON.parse(xhr.responseText);
                     var resultTable = document.getElementById('resultTable');
 
                     // Clear previous results
                     resultTable.innerHTML = '';
 
                     // Display new results
+                    var entities = response.entities;
                     for (var key in entities) {
                         if (entities.hasOwnProperty(key)) {
                             var row = resultTable.insertRow();
@@ -160,6 +149,13 @@
                             cell2.textContent = entities[key];
                         }
                     }
+
+                    // Set image from server path
+                    var imgPath = response.img_path;
+                    var output = document.getElementById('imagePreview');
+                    output.src = imgPath;
+                    output.style.display = 'block'; // Show the image preview
+
                 } else {
                     alert('Failed to upload the file. Please try again.');
                 }

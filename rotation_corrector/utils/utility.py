@@ -1,6 +1,7 @@
 import math
 import os
 
+import Levenshtein
 import cv2
 import numpy as np
 from PIL import Image
@@ -320,3 +321,10 @@ def filter_90_box(boxlist, debug=False, thresh=45):
         for ide, box_data in enumerate(list_angle_box):
             boxlist.append(box_data[1])
     return boxlist
+
+def cer_loss_one_image(sim_pred, label):
+    if max(len(sim_pred), len(label)) > 0:
+        loss = Levenshtein.distance(sim_pred, label) * 1.0 / max(len(sim_pred), len(label))
+    else:
+        return 0
+    return loss

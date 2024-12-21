@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, url_for
 from werkzeug.utils import secure_filename
 
 import app_config
@@ -31,8 +31,14 @@ def upload_file():
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], file_name)
             file.save(file_path)
 
-            entities = pipeline.process_image(file_path)
-            return jsonify(entities)
+            out_path, entities = pipeline.process_image(file_path)
+            # Generate a URL for the image that Flask can serve
+            relative_path = os.path.relpath(out_path, app.config['UPLOAD_FOLDER'])
+            img_url = url_for('static', filename=f'uploads/{relative_path}')
+            return jsonify({
+                'img_path': img_url,
+                'entities': entities
+            })
     return app.send_static_file('index.html')
 
 

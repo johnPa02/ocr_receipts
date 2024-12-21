@@ -2,8 +2,10 @@ import os.path
 import shutil
 import cv2
 import config
+from app_config import UPLOAD_FOLDER
 from text_detector.predict import CustomTextDetector
 from rotation_corrector.inference import ImageRotationCorrector
+from post_processing.PostProcessing import PostProcessor
 from key_info_extraction.predict import KeyInfoExtractor
 from text_recognitor.predict import TextRecognizer
 
@@ -19,6 +21,7 @@ class OCRPipeline:
         self.rotation_corrector = ImageRotationCorrector()
         self.text_recognizer = TextRecognizer()
         self.key_info_extractor = KeyInfoExtractor()
+        self.post_processor = PostProcessor()
 
     def process_image(self, img_path):
         if os.path.exists(config.kie_boxes_transcripts_temp):
@@ -29,7 +32,7 @@ class OCRPipeline:
         # Correct rotation
         img_rotated, boxes_list = self.rotation_corrector.process_image(img, boxes, self.text_detector)
         # Draw boxes for debugging
-        out_path = os.path.join(r'D:\ocr_receipts\text_detector\test_results', os.path.basename(img_path))
+        out_path = os.path.join(UPLOAD_FOLDER, os.path.basename(img_path))
         self.text_detector.draw_ocr(img_rotated, boxes_list, out_path)
         # Recognize text
         txts, scores = self.text_recognizer.recognize_text(img_rotated, boxes_list)
@@ -37,7 +40,9 @@ class OCRPipeline:
         images_folder = os.path.dirname(img_path)
         self.key_info_extractor.save_boxes_and_transcripts(img_path, boxes_list, txts, scores)
         entities = self.key_info_extractor.extract(images_folder, config.kie_boxes_transcripts_temp)
-        return entities
+        # Post-process
+        entities = self.post_processor.process(entities)
+        return out_path, entities
 
 
 if __name__ == '__main__':
@@ -46,6 +51,6 @@ if __name__ == '__main__':
     pathlib.PosixPath = pathlib.WindowsPath
 
     pipeline = OCRPipeline()
-    entities = pipeline.process_image(r'D:\ocr_receipts\data\val_images\mcocr_val_145115gozuc.jpg')
+    _, entities = pipeline.process_image(r'D:\ocr_receipts\data\val_images\mcocr_val_145115gozuc.jpg')
     print(entities)
     # mcocr_val_145115gozuc
